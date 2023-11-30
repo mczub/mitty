@@ -17,6 +17,9 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    FFLOGS_CLIENT_ID: z.string(),
+    FFLOGS_CLIENT_SECRET: z.string(),
+    FFLOGS_ACCESS_TOKEN: z.string(),
   },
 
   /**
@@ -35,6 +38,9 @@ export const env = createEnv({
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
+    FFLOGS_CLIENT_ID: process.env.FFLOGS_CLIENT_ID,
+    FFLOGS_CLIENT_SECRET: process.env.FFLOGS_CLIENT_SECRET,
+    FFLOGS_ACCESS_TOKEN: process.env.FFLOGS_ACCESS_TOKEN,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
