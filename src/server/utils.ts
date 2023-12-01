@@ -1,3 +1,5 @@
+import { arrayOutputType } from "zod";
+
 export type FflogsParams = {
   isValid: boolean;
   errorMessage?: string | undefined | null;
@@ -5,6 +7,21 @@ export type FflogsParams = {
   fightId?: number | undefined | null;
   isLastFight?: boolean | undefined | null;
 } 
+
+export type PhaseInfo = {
+  phaseName: string;
+  phaseNumber: number;
+}
+
+export type PhaseFightTimeline = {
+  phaseNumber: number;
+  damageEvents: Array<any>;
+}
+
+export type PhaseMitTimeline = {
+  phaseNumber: number;
+  expectedMitEvents: Array<any>;
+}
 
 const urlRegex =  /^(?:.*(?:fflogs\.com|ffxivlogs\.cn)\/reports\/)?(?<code>(?:a:)?[a-zA-Z0-9]{16})\/?(?:#(?=(?:.*fight=(?<fight>[^&]*))?)(?=(?:.*source=(?<source>[^&]*))?).*)?$/;
 

@@ -1,12 +1,18 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useState } from "react";
+import FightCollapser from "~/components/FightCollapser";
 
 import { api } from "~/utils/api";
 
 export default function Home() {
   const [logUrl, setLogUrl] = useState("");
   const logData = api.post.getLogData.useQuery({logUrl: logUrl}, {enabled: false});
+  const phaseInfo = api.post.getFightPhaseInfo.useQuery();
+  const phaseFightTimelines = api.post.getPhaseFightTimelines.useQuery();
+  const phaseMitTimelines = api.post.getPhaseMitTimelines.useQuery();
+
+  const fightCollapserProps = {phaseInfo: phaseInfo.data, phaseFightTimelines: phaseFightTimelines.data}
 
   return (
     <>
@@ -27,21 +33,22 @@ export default function Home() {
               <input 
                 type="text" 
                 name="logUrl"
-                className="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                className="input input-bordered w-full" 
                 placeholder="FFLogs URL" 
                 value={logUrl}
                 onChange={(e) => setLogUrl(e.target.value)}
                 required
               />
-              <button type="submit" className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Get Log</button>
+              <button type="submit" className="btn btn-primary btn-sm absolute end-2.5 bottom-2.5">Get Log</button>
             </div>
           </form>
           <p className="text-2xl text-white">
             {logData.data ? logData.data.url : "Loading..."}
           </p>
-          <p className="text-l text-white">
-            {logData.data?.fightData ? JSON.stringify(logData.data.fightData) : "Loading..."}
-          </p>
+          <div className="w-full">
+            {logData.data?.fightData && phaseInfo?.data && phaseFightTimelines?.data && phaseMitTimelines?.data ? 
+              <FightCollapser props={{phaseInfo: phaseInfo.data, phaseFightTimelines: phaseFightTimelines.data, phaseMitTimelines: phaseMitTimelines.data, logData: logData.data}} /> : "Loading..."}
+          </div>
         </div>
       </main>
     </>
