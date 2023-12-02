@@ -3,11 +3,19 @@ export const mergeFightTimelineWithLog = (logData: any, fightTimeline: any) => {
     phaseNumber: fightTimeline.phaseNumber,
     mitEvents: [] as any[],
   }
+  const logEventsData = logData.fightData.reportData.report.events.data;
 
   loggedMitTimeline.mitEvents.push(...fightTimeline.damageEvents.map((damageEvent: any) => {
+    const startAbilityIndex = damageEvent.abilityIndex[0];
+    const endAbilityIndex = damageEvent.abilityIndex[damageEvent.abilityIndex.length - 1];
+
+    const startTime = logEventsData.filter((logEvent: any) => logEvent.abilityGameID === damageEvent.abilityId)[startAbilityIndex]?.timestamp;
+    const endTime = logEventsData.filter((logEvent: any) => logEvent.abilityGameID === damageEvent.abilityId)[endAbilityIndex]?.timestamp;
     return {
       mechId: damageEvent.mechId,
       mechName: damageEvent.mechName,
+      startTime: startTime,
+      endTime: endTime,
       mits: buffIdsToNames(getBuffIdsFromDamageEvent(logData, damageEvent)),
       percentage: getMitPercentageFromDamageEvent(logData, damageEvent)
     }
@@ -28,7 +36,7 @@ const getBuffIdsFromDamageEvent = (logData: any, damageEvent: any): number[] => 
   const logEventsData = logData.fightData.reportData.report.events.data;
 
   const buffsToMerge: number[][] = damageEvent.abilityIndex.map((aIndex: number, index: number) => {
-    return (logEventsData.filter((logEvent: any) => logEvent.abilityGameID === damageEvent.abilityId)[aIndex]?.buffs).split('.')
+    return (logEventsData.filter((logEvent: any) => logEvent.abilityGameID === damageEvent.abilityId)[aIndex]?.buffs)?.split('.')
   });
 
   return [...new Set([...buffsToMerge.flat()])];
@@ -44,6 +52,15 @@ const mapIdToAbility = (buffId: number) => {
   return allMits.find((mit) => mit.abilityId == buffId);
 }
 
+export const msToDuration = (milliseconds: any): string => {
+  const min = Math.floor(parseInt(milliseconds) / 60000);
+  const sec = Math.floor((parseInt(milliseconds) % 60000) / 1000);
+
+  return sec === 60 ? 
+    `${min + 1}:00` :
+    `${min}:${sec.toString().padStart(2, '0')}`
+}
+
 const allMits = [
   { name: "Shake It Off", abilityId: 1001457, jobs: ['WAR'] },
   { name: "Divine Veil", abilityId: 1001362, jobs: ['PLD'] },
@@ -52,10 +69,14 @@ const allMits = [
   { name: "Dark Missionary", abilityId: 1001894, jobs: ['DRK'] },
   { name: "Reprisal", abilityId: 1001193, jobs: ['WAR', 'PLD', 'GNB', 'DRK'] },
   { name: "Seraphic Illumination", abilityId: 1001193, jobs: ['SCH'] },
-  { name: "Spreadlo/Galvanize", abilityId: 1000297, jobs: ['SCH'] },
+  { name: "Galvanize", abilityId: 1000297, jobs: ['SCH'] },
   { name: "Sacred Soil", abilityId: 1000299, jobs: ['SCH'] },
   { name: "Expedience", abilityId: 1002711, jobs: ['SCH'] },
   { name: "Fey Illumination", abilityId: 1000317, jobs: ['SCH']},
+  { name: "Eukrasian Prognosis", abilityId: 1002609, jobs: ['SGE']},
+  { name: "Kerachole", abilityId: 1002618, jobs: ['SGE']},
+  { name: "Panhaima", abilityId: 1002613, jobs: ['SGE']},
+  { name: "Holos", abilityId: 1003003, jobs: ['SGE']},
   { name: "Temperance", abilityId: 1001873, jobs: ['WHM']},
   { name: "Collective Unconscious", abilityId: 1000849, jobs: ['AST']},
   { name: "Neutral Sect", abilityId: 1001892, jobs: ['AST']},
@@ -82,10 +103,10 @@ export const typeToJob: Map<string, string> = new Map([
   ['Reaper', 'RPR'],
   ['Dragoon', 'DRG'],
   ['Samurai', 'SAM'],
-  ['Machinist', 'MCH'],
-  ['Bard', 'BRD'],
-  ['Dancer', 'DNC'],
   ['RedMage', 'RDM'],
   ['Summoner', 'SMN'],
   ['BlackMage', 'BLM'],
+  ['Machinist', 'MCH'],
+  ['Bard', 'BRD'],
+  ['Dancer', 'DNC'],
 ]);

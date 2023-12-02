@@ -5,7 +5,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import { gql, GraphQLClient } from 'graphql-request';
 
-import { getParamsFromUrl, PhaseInfo } from '~/server/utils';
+import { getParamsFromUrl, PhaseInfo, rangeToArray } from '~/server/utils';
 
 const fflogsEndpoint = "https://www.fflogs.com/api/v2/client"
 
@@ -18,10 +18,17 @@ const fflogsFullReportQuery = gql`
   {
     reportData {
       report(code: $reportCode) {
+        startTime
+        endTime
+        code
         fights {
           id
-          fightPercentage
+          startTime
+          endTime
           lastPhase
+          bossPercentage
+          fightPercentage
+          kill
           gameZone {
             name
           }
@@ -36,17 +43,27 @@ const fflogsSingleFightQuery = gql`
   {
     reportData {
       report(code: $reportCode) {
+        startTime
+        endTime
+        code
         playerDetails(fightIDs: [$fightId])
         fights(fightIDs: [$fightId]) {
           id
-          fightPercentage
+          name
+          startTime
+          endTime
           lastPhase
+          bossPercentage
+          fightPercentage
           kill
           gameZone {
             name
           }
         }
-        events(fightIDs: [$fightId], dataType: DamageTaken, filterExpression: $filter) {
+        events(fightIDs: [$fightId], dataType: DamageTaken, filterExpression: $filter, limit: 1000) {
+          data
+        }
+        deaths: events(fightIDs: [$fightId], dataType: Deaths) {
           data
         }
       }
@@ -94,7 +111,7 @@ const topPhaseFightTimelines = [
         mechName: "Pantokrator",
         abilityId: 31502,
         abilityName: "Guided Missle Kyrios",
-        abilityIndex: [0, 1],
+        abilityIndex: [0, 1, 2, 3, 4, 5, 6, 7],
       },
       {
         mechId: "p1-pantokrator-stack-1",
@@ -142,6 +159,168 @@ const topPhaseFightTimelines = [
         abilityId: 31529,
         abilityName: "Pile Pitch",
         abilityIndex: [0, 1, 2, 3, 4, 5, 6],
+      },
+    ]
+  },
+  { 
+    phaseNumber: 3,
+    damageEvents: [
+      {
+        mechId: "p3-hello-world",
+        mechName: "Hello, World",
+        abilityId: 31573,
+        abilityName: "Hello, World",
+        abilityIndex: [0, 1, 2, 3, 4, 5, 6, 7],
+      },
+      {
+        mechId: "p3-patch-1",
+        mechName: "1st Patch",
+        abilityId: 31587,
+        abilityName: "Patch",
+        abilityIndex: rangeToArray(0, 31),
+      },
+      {
+        mechId: "p3-patch-2",
+        mechName: "2nd Patch",
+        abilityId: 31587,
+        abilityName: "Patch",
+        abilityIndex: rangeToArray(32, 63),
+      },
+      {
+        mechId: "p3-patch-3",
+        mechName: "3rd Patch",
+        abilityId: 31587,
+        abilityName: "Patch",
+        abilityIndex: rangeToArray(64, 95),
+      },
+      {
+        mechId: "p3-patch-4",
+        mechName: "4th Patch",
+        abilityId: 31587,
+        abilityName: "Patch",
+        abilityIndex: rangeToArray(96, 127),
+      },
+      {
+        mechId: "p3-critical-error",
+        mechName: "Critical Error",
+        abilityId: 31588,
+        abilityName: "Critical Error",
+        abilityIndex: [0, 1, 2, 3, 4, 5, 6, 7],
+      },
+    ]
+  },
+  {
+    phaseNumber: 4,
+    damageEvents: [
+      {
+        mechId: "p4-protean-1",
+        mechName: "Protean 1",
+        abilityId: 31614,
+        abilityName: "Wave Cannon",
+        abilityIndex: rangeToArray(0, 7)
+      },
+      {
+        mechId: "p4-stack-1",
+        mechName: "Stack 1",
+        abilityId: 31615,
+        abilityName: "Wave Cannon",
+        abilityIndex: rangeToArray(0, 7)
+      },
+      {
+        mechId: "p4-protean-2",
+        mechName: "Protean 2",
+        abilityId: 31614,
+        abilityName: "Wave Cannon",
+        abilityIndex: rangeToArray(8, 15)
+      },
+      {
+        mechId: "p4-stack-2",
+        mechName: "Stack 2",
+        abilityId: 31615,
+        abilityName: "Wave Cannon",
+        abilityIndex: rangeToArray(8, 15)
+      },
+      {
+        mechId: "p4-protean-3",
+        mechName: "Protean 3",
+        abilityId: 31614,
+        abilityName: "Wave Cannon",
+        abilityIndex: rangeToArray(16, 23)
+      },
+      {
+        mechId: "p4-stack-3",
+        mechName: "Stack 3",
+        abilityId: 31615,
+        abilityName: "Wave Cannon",
+        abilityIndex: rangeToArray(16, 23)
+      },
+      {
+        mechId: "p4-blue-screen",
+        mechName: "Blue Screen",
+        abilityId: 31612,
+        abilityName: "Blue Screen",
+        abilityIndex: rangeToArray(0, 7)
+      }
+    ]
+  },
+  {
+    phaseNumber: 5,
+    damageEvents: [
+      {
+        mechId: "p5-delta-cast",
+        mechName: "Delta Cast",
+        abilityId: 31624,
+        abilityName: "Run: ****mi* (Delta Version)",
+        abilityIndex: rangeToArray(0, 7)
+      },
+      {
+        mechId: "p5-delta-mechanic",
+        mechName: "Delta Mechanic",
+        abilityId: 31587,
+        abilityName: "Patch",
+        abilityIndex: rangeToArray(128, 191)
+      },
+      {
+        mechId: "p5-sigma-cast",
+        mechName: "Sigma Cast",
+        abilityId: 32788,
+        abilityName: "Run: ****mi* (Sigma Version)",
+        abilityIndex: rangeToArray(0, 7)
+      },
+      {
+        mechId: "p5-sigma-clocks",
+        mechName: "Sigma Mechanic (Clock Spots)",
+        abilityId: 31604,
+        abilityName: "Wave Cannon",
+        abilityIndex: rangeToArray(0, 5)
+      },
+      {
+        mechId: "p5-sigma-towers",
+        mechName: "Sigma Mechanic (Towers)",
+        abilityId: 31493,
+        abilityName: "Storage Violation",
+        abilityIndex: rangeToArray(0, 5)
+      },
+      {
+        mechId: "p5-sigma-near-far",
+        mechName: "Sigma Mechanic (Near & Far)",
+        abilityId: 33041,
+        abilityName: "Hello, Distant World",
+        abilityIndex: rangeToArray(2, 3)
+      },
+      {
+        mechId: "p5-omega-cast",
+        mechName: "Omega Cast",
+        abilityId: 32789,
+        abilityName: "Run: ****mi* (Omega Version)",
+        abilityIndex: rangeToArray(0, 7)
+      },
+      {
+        mechId: "p5-blind-faith",
+        mechName: "Blind Faith",
+        abilityId: 32626,
+        abilityName: "Blind Faith",
+        abilityIndex: rangeToArray(0, 7)
       },
     ]
   }
@@ -208,11 +387,10 @@ const topPhaseMitTimelines = [
         expectedMits: [
           { name: "Shake It Off", abilityId: 1001457, jobs: ['WAR'] },
           { name: "Divine Veil", abilityId: 1001362, jobs: ['PLD'] },
-          { name: "Passage of Arms", abilityId: 1001176, jobs: ['PLD']},
           { name: "Heart of Light", abilityId: 1001839, jobs: ['GNB'] },
           { name: "Dark Missionary", abilityId: 1001894, jobs: ['DRK'] },
           { name: "Seraphic Illumination", abilityId: 1001193, jobs: ['SCH'] },
-          { name: "Spreadlo/Galvanize", abilityId: 1000297, jobs: ['SCH'] },
+          { name: "Galvanize", abilityId: 1000297, jobs: ['SCH'] },
           { name: "Sacred Soil", abilityId: 1000299, jobs: ['SCH'] },
           { name: "Expedience", abilityId: 1002711, jobs: ['SCH'] },
           { name: "Fey Illumination", abilityId: 1000317, jobs: ['SCH']},
@@ -231,11 +409,10 @@ const topPhaseMitTimelines = [
         expectedMits: [
           { name: "Shake It Off", abilityId: 1001457, jobs: ['WAR'] },
           { name: "Divine Veil", abilityId: 1001362, jobs: ['PLD'] },
-          { name: "Passage of Arms", abilityId: 1001176, jobs: ['PLD']},
           { name: "Heart of Light", abilityId: 1001839, jobs: ['GNB'] },
           { name: "Dark Missionary", abilityId: 1001894, jobs: ['DRK'] },
           { name: "Seraphic Illumination", abilityId: 1001193, jobs: ['SCH'] },
-          { name: "Spreadlo/Galvanize", abilityId: 1000297, jobs: ['SCH'] },
+          { name: "Galvanize", abilityId: 1000297, jobs: ['SCH'] },
           { name: "Sacred Soil", abilityId: 1000299, jobs: ['SCH'] },
           { name: "Expedience", abilityId: 1002711, jobs: ['SCH'] },
           { name: "Fey Illumination", abilityId: 1000317, jobs: ['SCH']},
@@ -249,6 +426,126 @@ const topPhaseMitTimelines = [
         ]
       },
     ]
+  },
+  { 
+    phaseNumber: 3,
+    expectedMitEvents: [
+      {
+        mechId: "p3-hello-world",
+        mechName: "Hello, World",
+        expectedMits: []
+      },
+      {
+        mechId: "p3-patch-1",
+        mechName: "1st Patch",
+        expectedMits: []
+      },
+      {
+        mechId: "p3-patch-2",
+        mechName: "2nd Patch",
+        expectedMits: []
+      },
+      {
+        mechId: "p3-patch-3",
+        mechName: "3rd Patch",
+        expectedMits: []
+      },
+      {
+        mechId: "p3-patch-4",
+        mechName: "4th Patch",
+        expectedMits: []
+      },
+      {
+        mechId: "p3-critical-error",
+        mechName: "Critical Error",
+        expectedMits: []
+      },
+    ]
+  },
+  {
+    phaseNumber: 4,
+    expectedMitEvents: [
+      {
+        mechId: "p4-protean-1",
+        mechName: "Protean 1",
+        expectedMits: []
+      },
+      {
+        mechId: "p4-stack-1",
+        mechName: "Stack 1",
+        expectedMits: []
+      },
+      {
+        mechId: "p4-protean-2",
+        mechName: "Protean 2",
+        expectedMits: []
+      },
+      {
+        mechId: "p4-stack-2",
+        mechName: "Stack 2",
+        expectedMits: []
+      },
+      {
+        mechId: "p4-protean-3",
+        mechName: "Protean 3",
+        expectedMits: []
+      },
+      {
+        mechId: "p4-stack-3",
+        mechName: "Stack 3",
+        expectedMits: []
+      },
+      {
+        mechId: "p4-blue-screen",
+        mechName: "Blue Screen",
+        expectedMits: []
+      }
+    ]
+  },
+  {
+    phaseNumber: 5,
+    expectedMitEvents: [
+      {
+        mechId: "p5-delta-cast",
+        mechName: "Delta Cast",
+        expectedMits: []
+      },
+      {
+        mechId: "p5-delta-mechanic",
+        mechName: "Delta Mechanic",
+        expectedMits: []
+      },
+      {
+        mechId: "p5-sigma-cast",
+        mechName: "Sigma Cast",
+        expectedMits: []
+      },
+      {
+        mechId: "p5-sigma-clocks",
+        mechName: "Sigma Mechanic (Clock Spots)",
+        expectedMits: []
+      },
+      {
+        mechId: "p5-sigma-towers",
+        mechName: "Sigma Mechanic (Towers)",
+        expectedMits: []
+      },
+      {
+        mechId: "p5-sigma-near-far",
+        mechName: "Sigma Mechanic (Near & Far)",
+        expectedMits: []
+      },
+      {
+        mechId: "p5-omega-cast",
+        mechName: "Omega Cast",
+        expectedMits: []
+      },
+      {
+        mechId: "p5-blind-faith",
+        mechName: "Blind Faith",
+        expectedMits: []
+      },
+    ]
   }
 ]
 
@@ -256,19 +553,17 @@ const topPhaseMitTimelines = [
 
 export const postRouter = createTRPCRouter({
   getLogData: publicProcedure
-    .input(z.object({ logUrl: z.string() }))
+    .input(z.object({ reportCode: z.string(), fightId: z.string() }))
     .query(async ({ input }) => {
-      const params = getParamsFromUrl(input.logUrl);
       let fightData;
-      if (!params.fightId) {
-        fightData = await fflogsClient.request<any>(fflogsFullReportQuery, params);
+      if (!input.fightId) {
+        fightData = await fflogsClient.request<any>(fflogsFullReportQuery, input);
       } else {
-        fightData = await fflogsClient.request<any>(fflogsSingleFightQuery, {...params, filter: `(encounterPhase = 1 OR encounterPhase = 2) AND type = "calculateddamage"`});
+        fightData = await fflogsClient.request<any>(fflogsSingleFightQuery, {...input, fightId: parseInt(input.fightId), filter: `type = "calculateddamage"`});
       }
       
       return {
-        url: input.logUrl,
-        params: params,
+        params: input,
         fightData: fightData
       }
     }),
