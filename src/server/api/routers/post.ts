@@ -23,6 +23,7 @@ const fflogsFullReportQuery = gql`
         code
         fights {
           id
+          name
           startTime
           endTime
           lastPhase
@@ -557,10 +558,21 @@ export const postRouter = createTRPCRouter({
     .query(async ({ input }) => {
       let fightData;
       if (!input.fightId) {
-        fightData = await fflogsClient.request<any>(fflogsFullReportQuery, input);
+        fightData = await fflogsClient.request<any>(fflogsFullReportQuery, {...input});
       } else {
         fightData = await fflogsClient.request<any>(fflogsSingleFightQuery, {...input, fightId: parseInt(input.fightId), filter: `type = "calculateddamage"`});
       }
+      
+      return {
+        params: input,
+        fightData: fightData
+      }
+    }),
+
+  getReportData: publicProcedure
+    .input(z.object({ reportCode: z.string() }))
+    .query(async ({ input }) => {
+      const fightData = await fflogsClient.request<any>(fflogsFullReportQuery, {...input});
       
       return {
         params: input,
