@@ -92,6 +92,14 @@ export default function Page() {
               <span>Sorry, right now this tool only supports The Omega Protocol. We're hoping to add more fights soon!</span>
             </div>
           }
+          {reportCode && !fightInfo &&
+            <div role="alert" className="alert w-1/3">
+              <svg className="w-[20px] h-[20px] text-gray-800 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5H1m0 0 4 4M1 5l4-4"/>
+              </svg>
+              <span>Select a fight in the dropdown to view mits.</span>
+            </div>
+          }
         </div>
       </main>
     </>

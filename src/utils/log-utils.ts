@@ -61,6 +61,53 @@ export const msToDuration = (milliseconds: any): string => {
     `${min}:${sec.toString().padStart(2, '0')}`
 }
 
+export const getPlayerDeaths = (logData: any) => {
+  const deathEventsData = logData.fightData.reportData.report.deaths.data;
+  const playerData: any = Object.values(logData.fightData.reportData.report.playerDetails.data.playerDetails).flat();
+
+  return deathEventsData.map((deathEvent: any) => {
+    const player = playerData.find((player: any) => player.id === deathEvent.targetID);
+    return {
+      timestamp: deathEvent.timestamp,
+      abilityId: deathEvent.killingAbilityGameID,
+      player: {
+        ...player,
+        job: typeToJob.get(player.type)
+      }
+    }
+  })
+}
+
+export const getPhaseStartTimestamps = (logData: any) => {
+  const targetabilityUpdates = logData.fightData.reportData.report.targetabilityUpdates?.data;
+  const fightStartTime = logData.fightData.reportData.report.fights[0].startTime;
+  const phaseStarts = [
+    {
+      phaseNumber: 1,
+      timestamp: 0,
+    }
+  ]
+  Object.keys(phaseStartTargetabilityIndex).forEach((phase) => {
+    const phaseNumber = parseInt(phase);
+    const targetabilityIndex = (phaseStartTargetabilityIndex as any)[phaseNumber]
+    if (targetabilityUpdates[targetabilityIndex]) {
+      phaseStarts.push({
+        phaseNumber: phaseNumber,
+        timestamp: targetabilityUpdates[targetabilityIndex].timestamp - fightStartTime
+      })
+    }
+  });
+  return phaseStarts;
+}
+
+const phaseStartTargetabilityIndex = {
+  2: 1,
+  3: 9,
+  4: 11,
+  5: 13,
+  6: 21
+}
+
 const allMits = [
   { name: "Shake It Off", abilityId: 1001457, jobs: ['WAR'] },
   { name: "Divine Veil", abilityId: 1001362, jobs: ['PLD'] },
@@ -87,6 +134,10 @@ const allMits = [
   { name: "Addle", abilityId: 1001203, jobs: ['RDM', 'SMN', 'BLM']},
   { name: "Dismantle", abilityId: 1000860, jobs: ['MCH']},
   { name: "Magick Barrier", abilityId: 1002707, jobs: ['RDM']},
+  { name: "Land Waker", abilityId: 1000863, jobs: ['WAR']},
+  { name: "Last Bastion", abilityId: 1000186, jobs: ['PLD']},
+  { name: "Gunmetal Soul", abilityId: 1001931, jobs: ['GNB']},
+  { name: "Dark Force", abilityId: 1000864, jobs: ['DRK']},
 ]
 
 export const typeToJob: Map<string, string> = new Map<string,string>([

@@ -12,7 +12,7 @@ export type FightCollapserProps = {props: {
 const getMitigationTable = (phaseFightTimelines: PhaseFightTimeline[], phaseMitTimelines: PhaseMitTimeline[], logData: any, index: number) => { 
   if (!phaseFightTimelines[index]) return;
   return (
-  <div className="collapse-content"> 
+  <div className="collapse-content !px-0"> 
     <PhaseMitigationTable props={{phaseFightTimeline: phaseFightTimelines[index], phaseMitTimeline: phaseMitTimelines[index], logData: logData}} />
   </div>
 )}

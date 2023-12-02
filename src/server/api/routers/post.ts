@@ -68,6 +68,9 @@ const fflogsSingleFightQuery = gql`
         deaths: events(fightIDs: [$fightId], dataType: Deaths) {
           data
         }
+        targetabilityUpdates: events(fightIDs: [$fightId], filterExpression: "type = \\\"targetabilityupdate\\\"") {
+          data
+        }
       }
     }
   }
@@ -301,7 +304,7 @@ const topPhaseFightTimelines = [
         mechName: "Sigma Mechanic (Towers)",
         abilityId: 31493,
         abilityName: "Storage Violation",
-        abilityIndex: rangeToArray(0, 5)
+        abilityIndex: rangeToArray(0, 4)
       },
       {
         mechId: "p5-sigma-near-far",
@@ -323,6 +326,88 @@ const topPhaseFightTimelines = [
         abilityId: 32626,
         abilityName: "Blind Faith",
         abilityIndex: rangeToArray(0, 7)
+      },
+    ]
+  },
+  {
+    phaseNumber: 6,
+    damageEvents: [
+      {
+        mechId: "p6-cosmo-memory",
+        mechName: "Cosmo Memory",
+        abilityId: 31649,
+        abilityName: "Cosmo Memory",
+        abilityIndex: rangeToArray(0, 7)
+      },
+      {
+        mechId: "p6-cosmo-dive-1",
+        mechName: "Cosmo Dive 1",
+        abilityId: 31656,
+        abilityName: "Cosmo Dive",
+        abilityIndex: rangeToArray(0, 5)
+      },
+      {
+        mechId: "p6-protean-1",
+        mechName: "Protean 1",
+        abilityId: 31659,
+        abilityName: "Wave Cannon",
+        abilityIndex: rangeToArray(0, 7)
+      },
+      {
+        mechId: "p6-wave-cannon-1",
+        mechName: "Wave Cannon 1",
+        abilityId: 31658,
+        abilityName: "Wave Cannon",
+        abilityIndex: rangeToArray(0, 7)
+      },
+      {
+        mechId: "p6-protean-2",
+        mechName: "Protean 2",
+        abilityId: 31659,
+        abilityName: "Wave Cannon",
+        abilityIndex: rangeToArray(8, 15)
+      },
+      {
+        mechId: "p6-wave-cannon-2",
+        mechName: "Wave Cannon 2",
+        abilityId: 31658,
+        abilityName: "Wave Cannon",
+        abilityIndex: rangeToArray(8, 15)
+      },
+      {
+        mechId: "p6-cosmo-dive-2",
+        mechName: "Cosmo Dive 2",
+        abilityId: 31656,
+        abilityName: "Cosmo Dive",
+        abilityIndex: rangeToArray(6, 11)
+      },
+      {
+        mechId: "p6-cosmo-meteor-meteors",
+        mechName: "Cosmo Meteor (Spread Meteors)",
+        abilityId: 32699,
+        abilityName: "Cosmo Meteor",
+        abilityIndex: rangeToArray(0, 15)
+      },
+      {
+        mechId: "p6-cosmo-meteor-flares",
+        mechName: "Cosmo Meteor (Flares)",
+        abilityId: 31667,
+        abilityName: "Cosmo Meteor",
+        abilityIndex: rangeToArray(0, 4)
+      },
+      {
+        mechId: "p6-magic-number-1",
+        mechName: "Magic Number 1",
+        abilityId: 31670,
+        abilityName: "Magic Number",
+        abilityIndex: rangeToArray(0, 7)
+      },
+      {
+        mechId: "p6-magic-number-2",
+        mechName: "Magic Number 2",
+        abilityId: 31670,
+        abilityName: "Magic Number",
+        abilityIndex: rangeToArray(8, 15)
       },
     ]
   }
@@ -539,6 +624,66 @@ const topPhaseMitTimelines = [
       {
         mechId: "p5-blind-faith",
         mechName: "Blind Faith",
+        expectedMits: []
+      },
+    ]
+  }, 
+  {
+    phaseNumber: 6,
+    expectedMitEvents: [
+      {
+        mechId: "p6-cosmo-memory",
+        mechName: "Cosmo Memory",
+        expectedMits: []
+      },
+      {
+        mechId: "p6-cosmo-dive-1",
+        mechName: "Cosmo Dive 1",
+        expectedMits: []
+      },
+      {
+        mechId: "p6-protean-1",
+        mechName: "Protean 1",
+        expectedMits: []
+      },
+      {
+        mechId: "p6-wave-cannon-1",
+        mechName: "Wave Cannon 1",
+        expectedMits: []
+      },
+      {
+        mechId: "p6-protean-2",
+        mechName: "Protean 2",
+        expectedMits: []
+      },
+      {
+        mechId: "p6-wave-cannon-2",
+        mechName: "Wave Cannon 2",
+        expectedMits: []
+      },
+      {
+        mechId: "p6-cosmo-dive-2",
+        mechName: "Cosmo Dive 2",
+        expectedMits: []
+      },
+      {
+        mechId: "p6-cosmo-meteor-meteors",
+        mechName: "Cosmo Meteor (Spread Meteors)",
+        expectedMits: []
+      },
+      {
+        mechId: "p6-cosmo-meteor-flares",
+        mechName: "Cosmo Meteor (Flares)",
+        expectedMits: []
+      },
+      {
+        mechId: "p6-magic-number-1",
+        mechName: "Magic Number 1",
+        expectedMits: []
+      },
+      {
+        mechId: "p6-magic-number-2",
+        mechName: "Magic Number 2",
         expectedMits: []
       },
     ]
