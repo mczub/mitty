@@ -359,7 +359,6 @@ const topPhaseMitTimelines = [
         mechName: "2nd Stack",
         expectedMits: [
           { name: "Reprisal", abilityId: 1001193, jobs: ['WAR', 'PLD', 'GNB', 'DRK'] },
-          { name: "Seraphic Illumination", abilityId: 1001193, jobs: ['SCH'] },
         ]
       },
       {
@@ -367,7 +366,6 @@ const topPhaseMitTimelines = [
         mechName: "3rd Stack",
         expectedMits: [
           { name: "Reprisal", abilityId: 1001193, jobs: ['WAR', 'PLD', 'GNB', 'DRK'] },
-          { name: "Seraphic Illumination", abilityId: 1001193, jobs: ['SCH'] },
           { name: "Feint", abilityId: 1001195, jobs: ['MNK', 'NIN', 'RPR', 'DRG', 'SAM']},
           { name: "Addle", abilityId: 1001203, jobs: ['RDM', 'SMN', 'BLM']},
           { name: "Dismantle", abilityId: 1000860, jobs: ['MCH']},
@@ -391,11 +389,9 @@ const topPhaseMitTimelines = [
           { name: "Divine Veil", abilityId: 1001362, jobs: ['PLD'] },
           { name: "Heart of Light", abilityId: 1001839, jobs: ['GNB'] },
           { name: "Dark Missionary", abilityId: 1001894, jobs: ['DRK'] },
-          { name: "Seraphic Illumination", abilityId: 1001193, jobs: ['SCH'] },
           { name: "Galvanize", abilityId: 1000297, jobs: ['SCH'] },
           { name: "Sacred Soil", abilityId: 1000299, jobs: ['SCH'] },
           { name: "Expedience", abilityId: 1002711, jobs: ['SCH'] },
-          { name: "Fey Illumination", abilityId: 1000317, jobs: ['SCH']},
           { name: "Temperance", abilityId: 1001873, jobs: ['WHM']},
           { name: "Collective Unconscious", abilityId: 1000849, jobs: ['AST']},
           { name: "Neutral Sect", abilityId: 1001892, jobs: ['AST']},
@@ -413,11 +409,9 @@ const topPhaseMitTimelines = [
           { name: "Divine Veil", abilityId: 1001362, jobs: ['PLD'] },
           { name: "Heart of Light", abilityId: 1001839, jobs: ['GNB'] },
           { name: "Dark Missionary", abilityId: 1001894, jobs: ['DRK'] },
-          { name: "Seraphic Illumination", abilityId: 1001193, jobs: ['SCH'] },
           { name: "Galvanize", abilityId: 1000297, jobs: ['SCH'] },
           { name: "Sacred Soil", abilityId: 1000299, jobs: ['SCH'] },
           { name: "Expedience", abilityId: 1002711, jobs: ['SCH'] },
-          { name: "Fey Illumination", abilityId: 1000317, jobs: ['SCH']},
           { name: "Temperance", abilityId: 1001873, jobs: ['WHM']},
           { name: "Collective Unconscious", abilityId: 1000849, jobs: ['AST']},
           { name: "Neutral Sect", abilityId: 1001892, jobs: ['AST']},
