@@ -18,6 +18,7 @@ const fflogsFullReportQuery = gql`
   {
     reportData {
       report(code: $reportCode) {
+        title
         startTime
         endTime
         code

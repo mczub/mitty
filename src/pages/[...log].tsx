@@ -30,7 +30,7 @@ export default function Page() {
   const phaseMitTimelines = api.post.getPhaseMitTimelines.useQuery();
 
   const fightInfo = logData?.data?.fightData?.reportData?.report?.fights[0];
-  const reportInfo = reportData?.data?.fightData?.reportData?.report?.fights;
+  const reportInfo = reportData?.data?.fightData?.reportData?.report;
 
   return (
     <>
@@ -48,15 +48,21 @@ export default function Page() {
               </Link>
             </div>
             <details className='dropdown flex-1' open={!fightInfo}>
-              <summary className="m-1 btn btn-ghost text-xl">{reportInfo ? reportInfo[0].name : ""}
+              <summary className="m-1 btn btn-ghost text-xl h-[4rem]">
+                {reportInfo ? 
+                  (<span className="mr-2"><div>{reportInfo.title}</div> <div className="text-sm text-left">{new Date(reportInfo.startTime).toLocaleDateString()}</div></span>) : 
+                  (<span className="loading loading-dots loading-sm"></span>)
+                }
                 <svg className="w-[12px] h-[12px] text-gray-800 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 10">
                   <path d="M15.434 1.235A2 2 0 0 0 13.586 0H2.414A2 2 0 0 0 1 3.414L6.586 9a2 2 0 0 0 2.828 0L15 3.414a2 2 0 0 0 .434-2.179Z"/>
                 </svg>
               </summary>
-              <ul className="p-2 shadow menu dropdown-content z-[50] bg-base-100 rounded-box w-52">
-                {reportInfo?.map((report: any) => {
+              <ul className="p-2 shadow menu dropdown-content z-[50] bg-base-100 rounded-box w-80">
+                {reportInfo?.fights.map((report: any) => {
                   return(
-                    <li><Link href={`/${reportCode}/${report.id}`}>#{report.id} {report.name} P{report.lastPhase} {report.bossPercentage}</Link></li>
+                    <li><Link href={`/${reportCode}/${report.id}`}>
+                      #{report.id} <span className="font-semibold">{report.name}</span> P{report.lastPhase} {report.bossPercentage}%
+                    </Link></li>
                   )
                 })}
               </ul>
@@ -68,7 +74,7 @@ export default function Page() {
               </svg>
             </a>
           </div>
-          {fightId && fightInfo && <div className="w-full">
+          {fightId && fightInfo && fightInfo.name === "The Omega Protocol" && <div className="w-full">
             {logData.data?.fightData && phaseInfo?.data && phaseFightTimelines?.data && phaseMitTimelines?.data ? 
               <FightCollapser props={{phaseInfo: phaseInfo.data, phaseFightTimelines: phaseFightTimelines.data, phaseMitTimelines: phaseMitTimelines.data, logData: logData.data}} /> : ""}
               {fightInfo?.kill ? 
@@ -79,6 +85,13 @@ export default function Page() {
                 </div> : null
               }
           </div>}
+          {fightId && !fightInfo && <div className="skeleton h-360"></div>}
+          {fightInfo && !(fightInfo.name === "The Omega Protocol") &&
+            <div role="alert" className="alert">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span>Sorry, right now this tool only supports The Omega Protocol. We're hoping to add more fights soon!</span>
+            </div>
+          }
         </div>
       </main>
     </>
