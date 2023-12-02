@@ -1,5 +1,5 @@
 export const mergeFightTimelineWithLog = (logData: any, fightTimeline: any) => {
-  let loggedMitTimeline = {
+  const loggedMitTimeline = {
     phaseNumber: fightTimeline.phaseNumber,
     mitEvents: [] as any[],
   }
@@ -89,7 +89,7 @@ const allMits = [
   { name: "Magick Barrier", abilityId: 1002707, jobs: ['RDM']},
 ]
 
-export const typeToJob: Map<string, string> = new Map([
+export const typeToJob: Map<string, string> = new Map<string,string>([
   ['Warrior', 'WAR'],
   ['Paladin', 'PLD'],
   ['Gunbreaker', 'GNB'],

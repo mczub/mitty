@@ -18,8 +18,8 @@ export default function Page() {
       return;
     }
 
-    setReportCode(router.query.log[0] || "");
-    setFightId(router.query.log[1] || "");
+    setReportCode(router.query.log[0] ?? "");
+    setFightId(router.query.log[1] ?? "");
 
   }, [router.isReady]);
   
