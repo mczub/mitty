@@ -50,7 +50,7 @@ export default function PhaseMitigationTable(props: PhaseMitigationTableProps) {
             <td>{!isNaN(myMits.mitEvents[index]?.percentage.min) ? <p className="text-lime-500 text-sm font-bold">{myMits.mitEvents[index]?.percentage?.min}% - {myMits.mitEvents[index]?.percentage?.max}%</p> : null}</td>
           </tr>
           {deaths.filter((death: any) => (deathsEndTime > death.timestamp - logStartTime) && (death.timestamp - logStartTime > deathsStartTime)).map((death: any) => {
-            return getDeathRow(death.timestamp - logStartTime, death.player.name, death.player.job, death.abilityId.toString())
+            return getDeathRow(death.timestamp - logStartTime, death.player.name, death.player.job, death.abilityId?.toString())
           })}
         </>
       )
