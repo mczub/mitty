@@ -62,7 +62,7 @@ const fflogsSingleFightQuery = gql`
             name
           }
         }
-        events(fightIDs: [$fightId], dataType: DamageTaken, filterExpression: $filter, limit: 1000) {
+        events(fightIDs: [$fightId], dataType: DamageTaken, filterExpression: $filter, limit: 2000) {
           data
         }
         deaths: events(fightIDs: [$fightId], dataType: Deaths) {
@@ -71,7 +71,7 @@ const fflogsSingleFightQuery = gql`
         targetabilityUpdates: events(fightIDs: [$fightId], filterExpression: "type = \\\"targetabilityupdate\\\"") {
           data
         }
-        enemyCastEvents: events(fightIDs: [$fightId], dataType: Casts, hostilityType: Enemies, filterExpression: "type = \\\"cast\\\"") {
+        enemyCastEvents: events(fightIDs: [$fightId], dataType: Casts, hostilityType: Enemies, filterExpression: "type = \\\"cast\\\"", limit: 2000) {
           data
         }
         masterData {

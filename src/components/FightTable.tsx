@@ -86,7 +86,11 @@ function FightTable(props: FightTableProps) {
     {fightInfo && (<div className="p-[1rem] navbar">#{ fightInfo.id } { fightInfo.name }</div>)}
     <div role="alert" className="alert">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-      <span>This fight isn't fully supported, but we're making our best guess as to the timeline.</span>
+      <span>
+        <div>This fight isn't fully supported, but we're making our best guess as to the timeline</div>
+        <div>We can't really tell the difference between different Reprisals or Feints at the moment, so it'll appear under both tanks or both melees.</div>
+        <div>Not every mitigation or survivability buff is in here yet, but we're working on it.</div>
+      </span>
     </div>
     <table className="table w-full table-fixed">
       <thead>
