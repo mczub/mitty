@@ -3,9 +3,10 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import FightCollapser from "~/components/FightCollapser";
+import FightTable from "~/components/FightTable";
 
 import { api } from "~/utils/api";
-import { msToDuration } from "~/utils/log-utils";
+import { getPercentage, getPxFromPhase, msToDuration } from "~/utils/log-utils";
 
 export default function Page() {
   const [reportCode, setReportCode] = useState("");
@@ -58,10 +59,10 @@ export default function Page() {
                 </svg>
               </summary>
               <ul className="p-2 shadow menu dropdown-content z-[50] bg-base-100 rounded-box w-80">
-                {reportInfo?.fights.map((report: any) => {
+                {reportInfo?.fights.filter((report: any) => report.bossPercentage).map((report: any) => {
                   return(
                     <li><Link href={`/${reportCode}/${report.id}`}>
-                      #{report.id} <span className="font-semibold">{report.name}</span> P{report.lastPhase} {report.bossPercentage}%
+                      { report.kill ? (<>#{report.id} <span className="font-semibold">{report.name}</span> Kill</>) : (<>#{report.id} <span className="font-semibold">{report.name}</span> {getPxFromPhase(report.lastPhase)} {getPercentage(report.bossPercentage)}</>)   }
                     </Link></li>
                   )
                 })}
@@ -87,9 +88,8 @@ export default function Page() {
           </div>}
           {fightId && !fightInfo && <div className="skeleton h-360"></div>}
           {fightInfo && !(fightInfo.name === "The Omega Protocol") &&
-            <div role="alert" className="alert">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              <span>Sorry, right now this tool only supports The Omega Protocol. We're hoping to add more fights soon!</span>
+            <div className="border border-base-300 bg-base-200">
+              {logData.data?.fightData && <FightTable props={{logData: logData.data}}/>}
             </div>
           }
           {reportCode && !fightInfo &&

@@ -48,7 +48,7 @@ export const buffIdsToNames = (buffIds: number[]) => {
   });
 }
 
-const mapIdToAbility = (buffId: number) => {
+const mapIdToAbility = (buffId: number): Mitigation | undefined => {
   return allMits.find((mit) => mit.abilityId == buffId);
 }
 
@@ -67,6 +67,7 @@ export const getPlayerDeaths = (logData: any) => {
 
   return deathEventsData.map((deathEvent: any) => {
     const player = playerData.find((player: any) => player.id === deathEvent.targetID);
+    if (!player) return;
     return {
       timestamp: deathEvent.timestamp,
       abilityId: deathEvent.killingAbilityGameID,
@@ -100,6 +101,135 @@ export const getPhaseStartTimestamps = (logData: any) => {
   return phaseStarts;
 }
 
+export type FightMitTimeline = {
+  startTime: number;
+  endTime: number;
+  mechanics: FightMechanic[];
+}
+
+export type FightMechanic = {
+  abilityIDs: number[];
+  mechID: string;
+  name: string;
+  startTime: number;
+  endTime: number;
+  damageEvents: CalculatedDamageEvent[];
+}
+
+export type CalculatedDamageEvent = {
+  abilityGameID: number;
+  buffs: string;
+  unmitigatedAmount: number;
+  amount: number;
+  sourceID: number;
+  targetID: number;
+  timestamp: number;
+  multiplier: number;
+}
+
+export type Mitigation = {
+  name: string;
+  abilityId: number;
+  jobs: string[];
+}
+
+export const getJobsInParty = (logData: any) => {
+  const logPlayerDetails = logData.fightData.reportData.report.playerDetails?.data?.playerDetails;
+  const jobsInParty = Object.values(logPlayerDetails).flat().map((player: any) => typeToJob.get(player.type));
+  const sortArray = Array.from(typeToJob.values());
+  return jobsInParty.sort((a: any, b: any) => sortArray.indexOf(a) > sortArray.indexOf(b) ? 1 : -1)
+}
+
+export const getMitsFromDamageEvents = (damageEvents: CalculatedDamageEvent[]): Mitigation[] => {
+  const buffsToMerge = damageEvents.map((event: CalculatedDamageEvent) => event.buffs).join().split('.');
+  const buffIds = [...new Set([...buffsToMerge.flat()])];
+  return buffIds.filter((id: string) => mapIdToAbility(parseInt(id))).map((id: string) => mapIdToAbility(parseInt(id))!)
+}
+
+export const getMitPercentagesFromDamageEvents = (damageEvents: CalculatedDamageEvent[]): any => {
+  const multipliers = damageEvents.map((event: CalculatedDamageEvent) => event.multiplier);
+  
+  return { min: Math.round((1 - Math.max(...multipliers)) * 100), max: Math.round((1 - Math.min(...multipliers)) * 100) }
+}
+
+export const getFightTimelineFromLog = (logData: any) => {
+  const enemyCasts = logData.fightData.reportData.report.enemyCastEvents?.data;
+  const events = logData.fightData.reportData.report.events?.data;
+  const masterData = logData.fightData.reportData.report.masterData;
+  const fightStartTime = logData.fightData.reportData.report.fights[0].startTime;
+  const fightEndTime = logData.fightData.reportData.report.fights[0].endTime;
+
+  const autoIDs = masterData.abilities.filter((ability: any) => ability.name === "attack").map((ability: any) => ability.gameID);
+  const eventsNoAutos = events.filter((event: any) => (!autoIDs.includes(event.abilityGameID)) && (event.abilityGameID !== 16152));
+
+  const fightTimeline: FightMitTimeline = {
+    startTime: fightStartTime,
+    endTime: fightEndTime,
+    mechanics: []
+  }
+
+  const allMechs: FightMechanic[] = [];
+  let eventsCursor = 0;
+  
+  const filteredEnemyCasts = enemyCasts.filter((cast: any) => {
+    return !cast.sourceInstance
+  });
+
+  const reducedCasts: any[] = [filteredEnemyCasts[0]!];
+
+  filteredEnemyCasts.forEach((cast: any, index: number) => {
+    if (index === 0) return;
+    const currentRealCast = reducedCasts.pop()!;
+    if (cast.timestamp < filteredEnemyCasts[index - 1].timestamp + 5000){
+      reducedCasts.push(currentRealCast);
+    } else {
+      reducedCasts.push(currentRealCast);
+      reducedCasts.push(cast);
+    }
+  });
+
+  reducedCasts.forEach((cast: any, index: number) => {
+    const slicedEvents = eventsNoAutos.slice(eventsCursor, eventsNoAutos.length - 1);
+    const nextCastEventIndex = slicedEvents.findIndex((event: CalculatedDamageEvent) => reducedCasts[index + 1] ? event.timestamp >= reducedCasts[index + 1].timestamp : false)
+    const castAbilityName = masterData.abilities.find((ability: any) => ability.gameID === cast.abilityGameID).name;
+    const mechanic: FightMechanic = {
+      mechID: castAbilityName.toLowerCase() + '-' + index.toString(),
+      abilityIDs: [cast.abilityGameID],
+      name: castAbilityName,
+      startTime: cast.timestamp,
+      endTime: cast.timestamp,
+      damageEvents: eventsNoAutos.slice(eventsCursor, nextCastEventIndex + eventsCursor),
+      
+    }
+    eventsCursor = eventsCursor + nextCastEventIndex;
+    if (mechanic.damageEvents.length === 0) return;
+    mechanic.endTime = mechanic.damageEvents[mechanic.damageEvents.length - 1]?.timestamp ?? mechanic.startTime;
+    allMechs.push(mechanic);
+  });
+
+  if (allMechs.length === 0) return;
+
+  fightTimeline.mechanics = allMechs;
+  
+  return fightTimeline;
+}
+
+export const getAbilityNameFromID = (abilityId: number, logData: any) => {
+  const masterData = logData?.fightData?.reportData?.report?.masterData;
+  return masterData?.abilities?.find((ability: any) => ability.gameID === abilityId)?.name ?? '';
+} 
+
+export const getPxFromPhase = (phase: number) => {
+  if (phase === 0) return '';
+  return `P${phase}`;
+}
+
+export const getPercentage = (percentage: number | string) => {
+  if (!percentage) return '--';
+  if (percentage === 0) return '--';
+  return `${percentage}%`
+}
+
 const phaseStartTargetabilityIndex = {
   2: 1,
   3: 9,
@@ -108,7 +238,7 @@ const phaseStartTargetabilityIndex = {
   6: 21
 }
 
-const allMits = [
+const allMits: Mitigation[] = [
   { name: "Shake It Off", abilityId: 1001457, jobs: ['WAR'] },
   { name: "Divine Veil", abilityId: 1001362, jobs: ['PLD'] },
   { name: "Passage of Arms", abilityId: 1001176, jobs: ['PLD']},

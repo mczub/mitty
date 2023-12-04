@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { PhaseFightTimeline, PhaseMitTimeline } from "~/server/utils";
-import { mergeFightTimelineWithLog, typeToJob, msToDuration, getPlayerDeaths, getPhaseStartTimestamps } from "~/utils/log-utils";
+import { mergeFightTimelineWithLog, typeToJob, msToDuration, getPlayerDeaths, getPhaseStartTimestamps, getJobsInParty, getAbilityNameFromID } from "~/utils/log-utils";
 
 export type PhaseMitigationTableProps = {props: {
-  phaseFightTimeline?: PhaseFightTimeline
-  phaseMitTimeline?: PhaseMitTimeline
+  phaseFightTimeline: PhaseFightTimeline
+  phaseMitTimeline: PhaseMitTimeline
   logData: any
 }}
 
@@ -39,7 +39,7 @@ export default function PhaseMitigationTable(props: PhaseMitigationTableProps) {
               {event.mechName}
             </td>
             { jobsInParty.map((job) => { 
-              const expectedMits = filterExpectedMits(phaseMitTimeline?.expectedMitEvents[index].expectedMits, logData, job);
+              const expectedMits = filterExpectedMits(phaseMitTimeline?.expectedMitEvents[index]?.expectedMits, logData, job);
               const foundMits = myMits.mitEvents[index]?.mits?.filter(((mit: any) => mit.jobs.includes(job))).map((mit: any) => mit.name)
               return(
                 <td>
@@ -50,7 +50,7 @@ export default function PhaseMitigationTable(props: PhaseMitigationTableProps) {
             <td>{!isNaN(myMits.mitEvents[index]?.percentage.min) ? <p className="text-lime-500 text-sm font-bold">{myMits.mitEvents[index]?.percentage?.min}% - {myMits.mitEvents[index]?.percentage?.max}%</p> : null}</td>
           </tr>
           {deaths.filter((death: any) => (deathsEndTime > death.timestamp - logStartTime) && (death.timestamp - logStartTime > deathsStartTime)).map((death: any) => {
-            return getDeathRow(death.timestamp - logStartTime, death.player.name, death.player.job, death.abilityId?.toString())
+            return getDeathRow(death.timestamp - logStartTime, death.player.name, death.player.job, getAbilityNameFromID(death.abilityId, logData))
           })}
         </>
       )
@@ -61,7 +61,7 @@ export default function PhaseMitigationTable(props: PhaseMitigationTableProps) {
     const startTime = phaseStartTime - logStartTime;
     const endTime = myMits.mitEvents[0]?.startTime ? myMits.mitEvents[0]?.startTime - logStartTime : phaseEndTime - logStartTime;
     return deaths.filter((death: any) => (endTime > death.timestamp - logStartTime) && (death.timestamp - logStartTime > startTime)).map((death: any) => {
-      return getDeathRow(death.timestamp - logStartTime, death.player.name, death.player.job, death.abilityId?.toString())
+      return getDeathRow(death.timestamp - logStartTime, death.player.name, death.player.job, getAbilityNameFromID(death.abilityId, logData))
     })
   }
 
@@ -99,13 +99,6 @@ const filterExpectedMits = (expectedMits: any, logData: any, job?: string) => {
   }
   const jobsInParty = Object.values(logPlayerDetails).flat().map((player: any) => typeToJob.get(player.type));
   return expectedMits.filter((mit: any) => mit?.jobs.some((job: any) => jobsInParty.includes(job))).map((mit: any) => mit.name);
-}
-
-const getJobsInParty = (logData: any) => {
-  const logPlayerDetails = logData.fightData.reportData.report.playerDetails?.data?.playerDetails;
-  const jobsInParty = Object.values(logPlayerDetails).flat().map((player: any) => typeToJob.get(player.type));
-  const sortArray = Array.from(typeToJob.values());
-  return jobsInParty.sort((a: any, b: any) => sortArray.indexOf(a) > sortArray.indexOf(b) ? 1 : -1)
 }
 
 const combineAndFormatMits = (expectedMits: any, foundMits: any): string[] => {
