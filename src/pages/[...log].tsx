@@ -24,8 +24,8 @@ export default function Page() {
 
   }, [router.isReady, router.query]);
   
-  const reportData = api.post.getReportData.useQuery({reportCode: reportCode}, {enabled: !!reportCode});
-  const logData = api.post.getLogData.useQuery({reportCode: reportCode, fightId: fightId}, {enabled: !!(reportCode && fightId)});
+  const reportData = api.post.getReportData.useQuery({reportCode: reportCode}, {enabled: !!reportCode, refetchOnWindowFocus: false});
+  const logData = api.post.getLogData.useQuery({reportCode: reportCode, fightId: fightId}, {enabled: !!(reportCode && fightId), refetchOnWindowFocus: false});
   const phaseInfo = api.post.getFightPhaseInfo.useQuery();
   const phaseFightTimelines = api.post.getPhaseFightTimelines.useQuery();
   const phaseMitTimelines = api.post.getPhaseMitTimelines.useQuery();
@@ -61,7 +61,7 @@ export default function Page() {
               <ul className="p-2 shadow menu dropdown-content z-[50] bg-base-100 rounded-box w-80">
                 {reportInfo?.fights.filter((report: any) => report.bossPercentage).map((report: any) => {
                   return(
-                    <li><Link href={`/${reportCode}/${report.id}`}>
+                    <li><Link prefetch={false} href={`/${reportCode}/${report.id}`}>
                       { report.kill ? (<>#{report.id} <span className="font-semibold">{report.name}</span> Kill</>) : (<>#{report.id} <span className="font-semibold">{report.name}</span> {getPxFromPhase(report.lastPhase)} {getPercentage(report.bossPercentage)}</>)   }
                     </Link></li>
                   )
