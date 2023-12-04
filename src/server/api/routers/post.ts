@@ -5,7 +5,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import { gql, GraphQLClient } from 'graphql-request';
 
-import { getParamsFromUrl, PhaseInfo, rangeToArray } from '~/server/utils';
+import { getParamsFromUrl, PhaseInfo, PhaseMitTimeline, rangeToArray } from '~/server/utils';
 
 const fflogsEndpoint = "https://www.fflogs.com/api/v2/client"
 
@@ -70,6 +70,16 @@ const fflogsSingleFightQuery = gql`
         }
         targetabilityUpdates: events(fightIDs: [$fightId], filterExpression: "type = \\\"targetabilityupdate\\\"") {
           data
+        }
+        enemyCastEvents: events(fightIDs: [$fightId], dataType: Casts, hostilityType: Enemies, filterExpression: "type = \\\"cast\\\"") {
+          data
+        }
+        masterData {
+          abilities {
+            gameID
+            name
+            type
+          }
         }
       }
     }
@@ -413,7 +423,7 @@ const topPhaseFightTimelines = [
   }
 ]
 
-const topPhaseMitTimelines = [
+const topPhaseMitTimelines: PhaseMitTimeline[] = [
   { 
     phaseNumber: 1,
     expectedMitEvents: [

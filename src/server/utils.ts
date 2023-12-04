@@ -1,5 +1,3 @@
-import { arrayOutputType } from "zod";
-
 export type FflogsParams = {
   isValid: boolean;
   errorMessage?: string | undefined | null;
@@ -15,12 +13,32 @@ export type PhaseInfo = {
 
 export type PhaseFightTimeline = {
   phaseNumber: number;
-  damageEvents: Array<any>;
+  damageEvents: PhaseFightDamageEvents[];
+}
+
+export type PhaseFightDamageEvents = {
+  mechId: string;
+  mechName: string;
+  abilityId: number;
+  abilityName: string;
+  abilityIndex: number[];
 }
 
 export type PhaseMitTimeline = {
   phaseNumber: number;
-  expectedMitEvents: Array<any>;
+  expectedMitEvents: MitEvent[];
+}
+
+export type MitEvent = {
+  mechId: string;
+  mechName: string;
+  expectedMits: Mitigation[];
+}
+
+export type Mitigation = {
+  name: string;
+  abilityId: number;
+  jobs: string[];
 }
 
 const urlRegex =  /^(?:.*(?:fflogs\.com|ffxivlogs\.cn)\/reports\/)?(?<code>(?:a:)?[a-zA-Z0-9]{16})\/?(?:#(?=(?:.*fight=(?<fight>[^&]*))?)(?=(?:.*source=(?<source>[^&]*))?).*)?$/;
